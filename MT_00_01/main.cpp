@@ -27,6 +27,12 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	/// 初期化
 	///=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=
 
+	Vector3 scale{ 1.2f, 0.79f, -2.1f };
+	Vector3 rotate{ 0.4f, 1.43f, -0.8f };
+	Vector3 translate{ 2.7f, -4.15f, 1.57f };
+
+	Matrix4x4 worldMatrix = MakeAffineMatrix(scale, rotate, translate);
+
 	// ウィンドウの×ボタンが押されるまでループ
 	while (Novice::ProcessMessage() == 0) {
 		// フレームの開始
@@ -35,18 +41,6 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		// キー入力を受け取る
 		memcpy(preKeys, keys, 256);
 		Novice::GetHitKeyStateAll(keys);
-
-		Vector3 v1{ 1.0f, 3.0f, -5.0f };
-		Vector3 v2{ 4.0f, -1.0f, 2.0f };
-		float k = { 4.0f };
-
-		Vector3 resultAdd = Add(v1, v2);
-		Vector3 resultSubtract = Subtract(v1, v2);
-		Vector3 resultMultiply = Multiply(k, v1);
-		float resultDot = Dot(v1, v2);
-		float resultLength = Length(v1);
-		Vector3 resultNormalize = Normalize(v2);
-		float kRowHeight = 20.0f;
 
 		///=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=
 		/// ボタン処理
@@ -61,12 +55,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		/// 描画処理
 		///=========================================================================================================================================================================================
 
-		VectorScreenPrintf(0, 0, resultAdd, "    : Add");
-		VectorScreenPrintf(0, (int)kRowHeight, resultSubtract, "    : Subtract");
-		VectorScreenPrintf(0, (int)kRowHeight * 2, resultMultiply, "    : Multiply");
-		Novice::ScreenPrintf(0, (int)kRowHeight * 3, "%.02f    : Dot", resultDot);
-		Novice::ScreenPrintf(0, (int)kRowHeight * 4, "%.02f    : Length", resultLength);
-		VectorScreenPrintf(0, (int)kRowHeight * 5, resultNormalize, "    : Normalize");
+		MatrixScreenPrintf(0, 0, worldMatrix, "worldMatrix");
 
 		/// XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 		/// StageEND
