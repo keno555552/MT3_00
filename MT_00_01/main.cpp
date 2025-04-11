@@ -26,6 +26,14 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	///=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=
 	/// 初期化
 	///=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=
+	Vector3 rotate{ 0.4f, 1.43f, -0.8f };
+
+	Matrix4x4 rotateXMatrix = MakeRotateXMatrix(rotate.x);
+	Matrix4x4 rotateYMatrix = MakeRotateYMatrix(rotate.y);
+	Matrix4x4 rotateZMatrix = MakeRotateZMatrix(rotate.z);
+	Matrix4x4 rotateXYZMatrix = MakeRotateMatrix(rotateXMatrix, rotateYMatrix, rotateZMatrix);
+
+	int kRowHeight = 20;
 
 	// ウィンドウの×ボタンが押されるまでループ
 	while (Novice::ProcessMessage() == 0) {
@@ -36,18 +44,6 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		memcpy(preKeys, keys, 256);
 		Novice::GetHitKeyStateAll(keys);
 
-		Vector3 v1{ 1.0f, 3.0f, -5.0f };
-		Vector3 v2{ 4.0f, -1.0f, 2.0f };
-		float k = { 4.0f };
-
-		Vector3 resultAdd = Add(v1, v2);
-		Vector3 resultSubtract = Subtract(v1, v2);
-		Vector3 resultMultiply = Multiply(k, v1);
-		float resultDot = Dot(v1, v2);
-		float resultLength = Length(v1);
-		Vector3 resultNormalize = Normalize(v2);
-		float kRowHeight = 20.0f;
-
 		///=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=
 		/// ボタン処理
 		///=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=
@@ -56,17 +52,13 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		/// 更新処理
 		///=========================================================================================================================================================================================
 
-
+		MatrixScreenPrintf(0, 0, rotateXMatrix, "rotateXMatrix");
+		MatrixScreenPrintf(0, kRowHeight * 5, rotateYMatrix, "rotateYMatrix");
+		MatrixScreenPrintf(0, kRowHeight * 5 * 2, rotateZMatrix, "rotateZMatrix");
+		MatrixScreenPrintf(0, kRowHeight * 5 * 3, rotateXYZMatrix, "rotateXYZMatrix");
 		///=========================================================================================================================================================================================
 		/// 描画処理
 		///=========================================================================================================================================================================================
-
-		VectorScreenPrintf(0, 0, resultAdd, "    : Add");
-		VectorScreenPrintf(0, (int)kRowHeight, resultSubtract, "    : Subtract");
-		VectorScreenPrintf(0, (int)kRowHeight * 2, resultMultiply, "    : Multiply");
-		Novice::ScreenPrintf(0, (int)kRowHeight * 3, "%.02f    : Dot", resultDot);
-		Novice::ScreenPrintf(0, (int)kRowHeight * 4, "%.02f    : Length", resultLength);
-		VectorScreenPrintf(0, (int)kRowHeight * 5, resultNormalize, "    : Normalize");
 
 		/// XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 		/// StageEND
