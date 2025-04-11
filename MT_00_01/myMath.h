@@ -1,9 +1,8 @@
 ﻿#pragma once
 #include <assert.h>
 #include <math.h>
-#include <Novice.h>
 
-///by keno v1.1
+///by keno v1.21
 
 #pragma region Vector2
 typedef struct Vector2 {
@@ -53,8 +52,6 @@ typedef struct Vector3 {
 	Vector3 normalize();
 }Vector3;
 
-/// ////////////////////////////////for this task
-
 // 加算
 Vector3 Add(const Vector3& v1, const Vector3& v2);
 
@@ -73,6 +70,9 @@ float Length(const Vector3& v);
 // 正規化
 Vector3 Normalize(const Vector3& v);
 
+// 表示
+void VectorScreenPrintf(int x, int y, const Vector3& vector, const char* label);
+
 #pragma endregion
 
 #pragma region Matrix3x3
@@ -88,12 +88,6 @@ typedef struct Matrix3x3 {
 	Matrix3x3 operator*(const Matrix3x3& target);
 
 }Matrix3x3;
-
-
-
-////////////////////////////////////////////////////////////////////////////陣列表示
-
-void VectorScreenPrintf(int x, int y, const Vector3& vector, const char* label);
 
 ////////////////////////////////////////////////////////////////////////////陣列変換
 
@@ -216,6 +210,57 @@ Matrix3x3 MakeOrthographicMatrix(Vector2 leftTop, Vector2 rightBottom);
 /// </summary>
 /// <returns></returns>
 Matrix3x3 MakeViewportMatrix(Vector2 leftTop, Vector2 rightBottom);
+
+#pragma endregion
+
+#pragma region Matrix4x4
+typedef struct Matrix4x4 {
+
+	///定義
+	float m[4][4];
+
+	///単位行列
+	Matrix4x4 Identity();
+	///逆行列
+	Matrix4x4 Inverse();
+	///転置行列
+	Matrix4x4 Transpose();
+
+	///演算子再定義
+	Matrix4x4 operator+(const Matrix4x4& target);
+	Matrix4x4 operator-(const Matrix4x4& target);
+	Matrix4x4 operator*(const Matrix4x4& target);
+	Matrix4x4 operator*(const float& target);
+	friend Matrix4x4 operator*(float scalar, const Matrix4x4& vec);
+
+
+}Matrix4x4;
+
+//////////////////////////////////////////////////////////////////////////陣列表示
+/// <summary>
+/// Matrix4x4を描写する
+/// </summary>
+/// <param name="x">左上のposX</param>
+/// <param name="y">左上のposY</param>
+/// <param name="matrix">描写したいMatrix3x3</param>
+void MatrixScreenPrintf(int x, int y, Matrix4x4& matrix, const char* name = nullptr);
+
+//////////////////////////////////////////////////////////////////////////陣列計算
+
+/// ///////////////////////for this task
+
+// 1. 行列的加法
+Matrix4x4 Add(const Matrix4x4& m1, const Matrix4x4& m2);
+// 2. 行列的減法
+Matrix4x4 Subtract(const Matrix4x4& m1, const Matrix4x4& m2);
+// 3. 行列の積
+Matrix4x4 Multiply(const Matrix4x4& m1, const Matrix4x4& m2);
+// 4. 逆行列
+Matrix4x4 Inverse(const Matrix4x4& m);
+// 5. 転置行列
+Matrix4x4 Transpose(const Matrix4x4 m);
+// 6. 単位行列の作成
+Matrix4x4 MakeIdentity4x4();
 
 #pragma endregion
 

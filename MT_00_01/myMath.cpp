@@ -1,4 +1,5 @@
 ﻿#include "myMath.h"
+#include "Novice.h"
 
 #pragma region Vector2
 Vector2 Vector2::operator+(const Vector2& target)
@@ -100,9 +101,7 @@ Vector3 operator*(int scalar, const Vector3& vec)
 
 Vector3 Vector3::helmholtz()
 {
-	//return { sqrtf(x * x + sqrtf(y * y + z * z)) };
-	//return { sqrtf(x * x + y * y + z * z) };
-	return { sqrtf(x * x),sqrtf(y * y),sqrtf(z * z)};
+	return { sqrtf(x * x),sqrtf(y * y),sqrtf(z * z) };
 }
 
 Vector3 Vector3::normalize()
@@ -113,8 +112,6 @@ Vector3 Vector3::normalize()
 	}
 	return Vector3();
 }
-
-///for this task
 
 Vector3 Add(const Vector3& V1, const Vector3& V2) {
 	return { V1.x + V2.x, V1.y + V2.y , V1.z + V2.z };
@@ -195,11 +192,9 @@ Matrix3x3 Matrix3x3::operator*(const Matrix3x3& target)
 	return result;
 }
 
-
-
 ////////////////////////////////////////////////////////////////////////////陣列変換
 
-Matrix3x3 MakeTranslateMatrix3x3 (const Vector2 translate) {
+Matrix3x3 MakeTranslateMatrix3x3(const Vector2 translate) {
 	return { 1,0,0,
 			 0,1,0,
 			  translate.x,translate.y,1 };
@@ -330,6 +325,492 @@ Matrix3x3 MakeViewportMatrix(Vector2 leftTop, Vector2 rightBottom)
 }
 #pragma endregion
 
+#pragma region Matrix4x4
+Matrix4x4 Matrix4x4::Identity()
+{
+	Matrix4x4 resuit = {};
+	for (int i = 0; i < 4; i++) {
+		for (int j = 0; j < 4; j++) {
+			resuit.m[i][j] = 0;
+			m[i][j] = 0;
+			if (i == j) {
+				resuit.m[i][j] = 1;
+				m[i][j] = 1;
+			}
+		}
+	}
+	return resuit;
+}
+
+Matrix4x4 Matrix4x4::Inverse() {
+	float determinant = m[0][0] * m[1][1] * m[2][2] * m[3][3]
+		+ m[0][0] * m[1][2] * m[2][3] * m[3][1]
+		+ m[0][0] * m[1][3] * m[2][1] * m[3][2]
+
+		- m[0][0] * m[1][3] * m[2][2] * m[3][1]
+		- m[0][0] * m[1][2] * m[2][1] * m[3][3]
+		- m[0][0] * m[1][1] * m[2][3] * m[3][2]
+
+		- m[0][1] * m[1][0] * m[2][2] * m[3][3]
+		- m[0][2] * m[1][0] * m[2][3] * m[3][1]
+		- m[0][3] * m[1][0] * m[2][1] * m[3][2]
+
+		+ m[0][3] * m[1][0] * m[2][2] * m[3][1]
+		+ m[0][2] * m[1][0] * m[2][1] * m[3][3]
+		+ m[0][1] * m[1][0] * m[2][3] * m[3][2]
+
+		+ m[0][1] * m[1][2] * m[2][0] * m[3][3]
+		+ m[0][2] * m[1][3] * m[2][0] * m[3][1]
+		+ m[0][3] * m[1][1] * m[2][0] * m[3][2]
+
+		- m[0][3] * m[1][2] * m[2][0] * m[3][1]
+		- m[0][2] * m[1][1] * m[2][0] * m[3][3]
+		- m[0][1] * m[1][3] * m[2][0] * m[3][2]
+
+		- m[0][1] * m[1][2] * m[2][3] * m[3][0]
+		- m[0][2] * m[1][3] * m[2][1] * m[3][0]
+		- m[0][3] * m[1][1] * m[2][2] * m[3][0]
+
+		+ m[0][3] * m[1][2] * m[2][1] * m[3][0]
+		+ m[0][2] * m[1][1] * m[2][3] * m[3][0]
+		+ m[0][1] * m[1][3] * m[2][2] * m[3][0];
+
+	return Matrix4x4{ (m[1][1] * m[2][2] * m[3][3]
+					 + m[1][2] * m[2][3] * m[3][1]
+					 + m[1][3] * m[2][1] * m[3][2]
+					 - m[1][3] * m[2][2] * m[3][1]
+					 - m[1][2] * m[2][1] * m[3][3]
+					 - m[1][1] * m[2][3] * m[3][2]) / determinant,/// 11
+
+					(-m[0][1] * m[2][2] * m[3][3]
+					 - m[0][2] * m[2][3] * m[3][1]
+					 - m[0][3] * m[2][1] * m[3][2]
+					 + m[0][3] * m[2][2] * m[3][1]
+					 + m[0][2] * m[2][1] * m[3][3]
+					 + m[0][1] * m[2][3] * m[3][2]) / determinant,/// 12
+
+					(+m[0][1] * m[1][2] * m[3][3]
+					 + m[0][2] * m[1][3] * m[3][1]
+					 + m[0][3] * m[1][1] * m[3][2]
+					 - m[0][3] * m[1][2] * m[3][1]
+					 - m[0][2] * m[1][1] * m[3][3]
+					 - m[0][1] * m[1][3] * m[3][2]) / determinant,/// 13
+
+					(-m[0][1] * m[1][2] * m[2][3]
+					 - m[0][2] * m[1][3] * m[2][1]
+					 - m[0][3] * m[1][1] * m[2][2]
+					 + m[0][3] * m[1][2] * m[2][1]
+					 + m[0][2] * m[1][1] * m[2][3]
+					 + m[0][1] * m[1][3] * m[2][2]) / determinant,/// 14
+
+					(-m[1][0] * m[2][2] * m[3][3]
+					 - m[1][2] * m[2][3] * m[3][0]
+					 - m[1][3] * m[2][0] * m[3][2]
+					 + m[1][3] * m[2][2] * m[3][0]
+					 + m[1][2] * m[2][0] * m[3][3]
+					 + m[1][0] * m[2][3] * m[3][2]) / determinant,/// 21
+
+					(+m[0][0] * m[2][2] * m[3][3]
+					 + m[0][2] * m[2][3] * m[3][0]
+					 + m[0][3] * m[2][0] * m[3][2]
+					 - m[0][3] * m[2][2] * m[3][0]
+					 - m[0][2] * m[2][0] * m[3][3]
+					 - m[0][0] * m[2][3] * m[3][2]) / determinant,/// 22
+
+					(-m[0][0] * m[1][2] * m[3][3]
+					 - m[0][2] * m[1][3] * m[3][0]
+					 - m[0][3] * m[1][0] * m[3][2]
+					 + m[0][3] * m[1][2] * m[3][0]
+					 + m[0][2] * m[1][0] * m[3][3]
+					 + m[0][0] * m[1][3] * m[3][2]) / determinant,/// 23
+
+					(+m[0][0] * m[1][2] * m[2][3]
+					 + m[0][2] * m[1][3] * m[2][0]
+					 + m[0][3] * m[1][0] * m[2][2]
+					 - m[0][3] * m[1][2] * m[2][0]
+					 - m[0][2] * m[1][0] * m[2][3]
+					 - m[0][0] * m[1][3] * m[2][2]) / determinant,/// 24
+
+					(+m[1][0] * m[2][1] * m[3][3]
+					 + m[1][1] * m[2][3] * m[3][0]
+					 + m[1][3] * m[2][0] * m[3][1]
+					 - m[1][3] * m[2][1] * m[3][0]
+					 - m[1][1] * m[2][0] * m[3][3]
+					 - m[1][0] * m[2][3] * m[3][1]) / determinant,/// 31
+
+					(-m[0][0] * m[2][1] * m[3][3]
+					 - m[0][1] * m[2][3] * m[3][0]
+					 - m[0][3] * m[2][0] * m[3][1]
+					 + m[0][3] * m[2][1] * m[3][0]
+					 + m[0][1] * m[2][0] * m[3][3]
+					 + m[0][0] * m[2][3] * m[3][1]) / determinant,/// 32
+
+					(+m[0][0] * m[1][1] * m[3][3]
+					 + m[0][1] * m[1][3] * m[3][0]
+					 + m[0][3] * m[1][0] * m[3][1]
+					 - m[0][3] * m[1][1] * m[3][0]
+					 - m[0][1] * m[1][0] * m[3][3]
+					 - m[0][0] * m[1][3] * m[3][1]) / determinant,/// 33
+
+					(-m[0][0] * m[1][1] * m[2][3]
+					 - m[0][1] * m[1][3] * m[2][0]
+					 - m[0][3] * m[1][0] * m[2][1]
+					 + m[0][3] * m[1][1] * m[2][0]
+					 + m[0][1] * m[1][0] * m[2][3]
+					 + m[0][0] * m[1][3] * m[2][1]) / determinant,/// 34
+
+					(-m[1][0] * m[2][1] * m[3][2]
+					 - m[1][1] * m[2][2] * m[3][0]
+					 - m[1][2] * m[2][0] * m[3][1]
+					 + m[1][2] * m[2][1] * m[3][0]
+					 + m[1][1] * m[2][0] * m[3][2]
+					 + m[1][0] * m[2][2] * m[3][1]) / determinant,/// 41
+
+					(+m[0][0] * m[2][1] * m[3][2]
+					 + m[0][1] * m[2][2] * m[3][0]
+					 + m[0][2] * m[2][0] * m[3][1]
+					 - m[0][2] * m[2][1] * m[3][0]
+					 - m[0][1] * m[2][0] * m[3][2]
+					 - m[0][0] * m[2][2] * m[3][1]) / determinant,/// 42
+
+					(-m[0][0] * m[1][1] * m[3][2]
+					 - m[0][1] * m[1][2] * m[3][0]
+					 - m[0][2] * m[1][0] * m[3][1]
+					 + m[0][2] * m[1][1] * m[3][0]
+					 + m[0][1] * m[1][0] * m[3][2]
+					 + m[0][0] * m[1][2] * m[3][1]) / determinant,/// 43
+
+					(+m[0][0] * m[1][1] * m[2][2]
+					 + m[0][1] * m[1][2] * m[2][0]
+					 + m[0][2] * m[1][0] * m[2][1]
+					 - m[0][2] * m[1][1] * m[2][0]
+					 - m[0][1] * m[1][0] * m[2][2]
+					 - m[0][0] * m[1][2] * m[2][1]) / determinant /// 44
+	};
+}
+
+Matrix4x4 Matrix4x4::Transpose()
+{
+	Matrix4x4 result = {};
+	Matrix4x4 a = *this;
+	for (int i = 0; i < 4; i++) {
+		for (int j = 0; j < 4; j++) {
+			result.m[i][j] = a.m[j][i];
+			m[i][j] = a.m[j][i];
+
+		}
+	}
+	return result;
+}
+
+Matrix4x4 Matrix4x4::operator+(const Matrix4x4& target)
+{
+	Matrix4x4 resuit = {};
+	for (int x = 0; x < 4; x++) {
+		for (int y = 0; y < 4; y++) {
+			resuit.m[x][y] = m[x][y] + target.m[x][y];
+		}
+	}
+
+	return resuit;
+}
+
+Matrix4x4 Matrix4x4::operator-(const Matrix4x4& target)
+{
+	Matrix4x4 resuit = {};
+	for (int x = 0; x < 4; x++) {
+		for (int y = 0; y < 4; y++) {
+			resuit.m[x][y] = m[x][y] - target.m[x][y];
+		}
+	}
+	return resuit;
+}
+
+Matrix4x4 Matrix4x4::operator*(const Matrix4x4& target)
+{
+	//Matrix3x3 result = {};
+	//for (int i = 0; i < 3; i++) {
+	//	for (int j = 0; j < 3; j++) {
+	//		for (int k = 0; k < 3; k++) {
+	//			result.m[i][j] += m[i][k] * target.m[k][j];
+	//		}
+	//	}
+	//}
+	//return result;
+
+	Matrix4x4 resuit = {};
+	for (int i = 0; i < 4; i++) {
+		for (int j = 0; j < 4; j++) {
+			for (int k = 0; k < 4; k++) {
+				resuit.m[i][j] += m[i][k] * target.m[k][j];
+			}
+		}
+	}
+	return resuit;
+}
+
+Matrix4x4 Matrix4x4::operator*(const float& target)
+{
+	Matrix4x4 resuit = {};
+	for (int x = 0; x < 4; x++) {
+		for (int y = 0; y < 4; y++) {
+			resuit.m[x][y] = m[x][y] * target;
+		}
+	}
+	return resuit;
+}
+
+
+Matrix4x4 operator*(float scalar, const Matrix4x4& vec)
+{
+	Matrix4x4 resuit = {};
+	for (int x = 0; x < 4; x++) {
+		for (int y = 0; y < 4; y++) {
+			resuit.m[x][y] = vec.m[x][y] * scalar;
+		}
+	}
+	return resuit;
+}
+
+//////////////////////////////////////////////////////////////////////////陣列表示
+
+Matrix4x4 Add(const Matrix4x4& m1, const Matrix4x4& m2) {
+	Matrix4x4 resuit = {};
+	for (int x = 0; x < 4; x++) {
+		for (int y = 0; y < 4; y++) {
+			resuit.m[x][y] = m1.m[x][y] + m2.m[x][y];
+		}
+	}
+	return resuit;
+}
+
+Matrix4x4 Subtract(const Matrix4x4& m1, const Matrix4x4& m2) {
+	Matrix4x4 resuit = {};
+	for (int x = 0; x < 4; x++) {
+		for (int y = 0; y < 4; y++) {
+			resuit.m[x][y] = m1.m[x][y] - m2.m[x][y];
+		}
+	}
+	return resuit;
+}
+
+Matrix4x4 Multiply(const Matrix4x4& m1, const Matrix4x4& m2) {
+	Matrix4x4 resuit = {};
+	for (int i = 0; i < 4; i++) {
+		for (int j = 0; j < 4; j++) {
+			for (int k = 0; k < 4; k++) {
+				resuit.m[i][j] += m1.m[i][k] * m2.m[k][j];
+			}
+		}
+	}
+	return resuit;
+}
+
+Matrix4x4 Inverse(const Matrix4x4& m) {
+	float determinant = m.m[0][0] * m.m[1][1] * m.m[2][2] * m.m[3][3]
+		+ m.m[0][0] * m.m[1][2] * m.m[2][3] * m.m[3][1]
+		+ m.m[0][0] * m.m[1][3] * m.m[2][1] * m.m[3][2]
+
+		- m.m[0][0] * m.m[1][3] * m.m[2][2] * m.m[3][1]
+		- m.m[0][0] * m.m[1][2] * m.m[2][1] * m.m[3][3]
+		- m.m[0][0] * m.m[1][1] * m.m[2][3] * m.m[3][2]
+
+		- m.m[0][1] * m.m[1][0] * m.m[2][2] * m.m[3][3]
+		- m.m[0][2] * m.m[1][0] * m.m[2][3] * m.m[3][1]
+		- m.m[0][3] * m.m[1][0] * m.m[2][1] * m.m[3][2]
+
+		+ m.m[0][3] * m.m[1][0] * m.m[2][2] * m.m[3][1]
+		+ m.m[0][2] * m.m[1][0] * m.m[2][1] * m.m[3][3]
+		+ m.m[0][1] * m.m[1][0] * m.m[2][3] * m.m[3][2]
+
+		+ m.m[0][1] * m.m[1][2] * m.m[2][0] * m.m[3][3]
+		+ m.m[0][2] * m.m[1][3] * m.m[2][0] * m.m[3][1]
+		+ m.m[0][3] * m.m[1][1] * m.m[2][0] * m.m[3][2]
+
+		- m.m[0][3] * m.m[1][2] * m.m[2][0] * m.m[3][1]
+		- m.m[0][2] * m.m[1][1] * m.m[2][0] * m.m[3][3]
+		- m.m[0][1] * m.m[1][3] * m.m[2][0] * m.m[3][2]
+
+		- m.m[0][1] * m.m[1][2] * m.m[2][3] * m.m[3][0]
+		- m.m[0][2] * m.m[1][3] * m.m[2][1] * m.m[3][0]
+		- m.m[0][3] * m.m[1][1] * m.m[2][2] * m.m[3][0]
+
+		+ m.m[0][3] * m.m[1][2] * m.m[2][1] * m.m[3][0]
+		+ m.m[0][2] * m.m[1][1] * m.m[2][3] * m.m[3][0]
+		+ m.m[0][1] * m.m[1][3] * m.m[2][2] * m.m[3][0];
+
+	return Matrix4x4{ (m.m[1][1] * m.m[2][2] * m.m[3][3]
+					 + m.m[1][2] * m.m[2][3] * m.m[3][1]
+					 + m.m[1][3] * m.m[2][1] * m.m[3][2]
+					 - m.m[1][3] * m.m[2][2] * m.m[3][1]
+					 - m.m[1][2] * m.m[2][1] * m.m[3][3]
+					 - m.m[1][1] * m.m[2][3] * m.m[3][2]) / determinant,/// 11
+
+					(-m.m[0][1] * m.m[2][2] * m.m[3][3]
+					 - m.m[0][2] * m.m[2][3] * m.m[3][1]
+					 - m.m[0][3] * m.m[2][1] * m.m[3][2]
+					 + m.m[0][3] * m.m[2][2] * m.m[3][1]
+					 + m.m[0][2] * m.m[2][1] * m.m[3][3]
+					 + m.m[0][1] * m.m[2][3] * m.m[3][2]) / determinant,/// 12
+
+					(+m.m[0][1] * m.m[1][2] * m.m[3][3]
+					 + m.m[0][2] * m.m[1][3] * m.m[3][1]
+					 + m.m[0][3] * m.m[1][1] * m.m[3][2]
+					 - m.m[0][3] * m.m[1][2] * m.m[3][1]
+					 - m.m[0][2] * m.m[1][1] * m.m[3][3]
+					 - m.m[0][1] * m.m[1][3] * m.m[3][2]) / determinant,/// 13
+
+					(-m.m[0][1] * m.m[1][2] * m.m[2][3]
+					 - m.m[0][2] * m.m[1][3] * m.m[2][1]
+					 - m.m[0][3] * m.m[1][1] * m.m[2][2]
+					 + m.m[0][3] * m.m[1][2] * m.m[2][1]
+					 + m.m[0][2] * m.m[1][1] * m.m[2][3]
+					 + m.m[0][1] * m.m[1][3] * m.m[2][2]) / determinant,/// 14
+
+					(-m.m[1][0] * m.m[2][2] * m.m[3][3]
+					 - m.m[1][2] * m.m[2][3] * m.m[3][0]
+					 - m.m[1][3] * m.m[2][0] * m.m[3][2]
+					 + m.m[1][3] * m.m[2][2] * m.m[3][0]
+					 + m.m[1][2] * m.m[2][0] * m.m[3][3]
+					 + m.m[1][0] * m.m[2][3] * m.m[3][2]) / determinant,/// 21
+
+					(+m.m[0][0] * m.m[2][2] * m.m[3][3]
+					 + m.m[0][2] * m.m[2][3] * m.m[3][0]
+					 + m.m[0][3] * m.m[2][0] * m.m[3][2]
+					 - m.m[0][3] * m.m[2][2] * m.m[3][0]
+					 - m.m[0][2] * m.m[2][0] * m.m[3][3]
+					 - m.m[0][0] * m.m[2][3] * m.m[3][2]) / determinant,/// 22
+
+					(-m.m[0][0] * m.m[1][2] * m.m[3][3]
+					 - m.m[0][2] * m.m[1][3] * m.m[3][0]
+					 - m.m[0][3] * m.m[1][0] * m.m[3][2]
+					 + m.m[0][3] * m.m[1][2] * m.m[3][0]
+					 + m.m[0][2] * m.m[1][0] * m.m[3][3]
+					 + m.m[0][0] * m.m[1][3] * m.m[3][2]) / determinant,/// 23
+
+					(+m.m[0][0] * m.m[1][2] * m.m[2][3]
+					 + m.m[0][2] * m.m[1][3] * m.m[2][0]
+					 + m.m[0][3] * m.m[1][0] * m.m[2][2]
+					 - m.m[0][3] * m.m[1][2] * m.m[2][0]
+					 - m.m[0][2] * m.m[1][0] * m.m[2][3]
+					 - m.m[0][0] * m.m[1][3] * m.m[2][2]) / determinant,/// 24
+
+					(+m.m[1][0] * m.m[2][1] * m.m[3][3]
+					 + m.m[1][1] * m.m[2][3] * m.m[3][0]
+					 + m.m[1][3] * m.m[2][0] * m.m[3][1]
+					 - m.m[1][3] * m.m[2][1] * m.m[3][0]
+					 - m.m[1][1] * m.m[2][0] * m.m[3][3]
+					 - m.m[1][0] * m.m[2][3] * m.m[3][1]) / determinant,/// 31
+
+					(-m.m[0][0] * m.m[2][1] * m.m[3][3]
+					 - m.m[0][1] * m.m[2][3] * m.m[3][0]
+					 - m.m[0][3] * m.m[2][0] * m.m[3][1]
+					 + m.m[0][3] * m.m[2][1] * m.m[3][0]
+					 + m.m[0][1] * m.m[2][0] * m.m[3][3]
+					 + m.m[0][0] * m.m[2][3] * m.m[3][1]) / determinant,/// 32
+
+					(+m.m[0][0] * m.m[1][1] * m.m[3][3]
+					 + m.m[0][1] * m.m[1][3] * m.m[3][0]
+					 + m.m[0][3] * m.m[1][0] * m.m[3][1]
+					 - m.m[0][3] * m.m[1][1] * m.m[3][0]
+					 - m.m[0][1] * m.m[1][0] * m.m[3][3]
+					 - m.m[0][0] * m.m[1][3] * m.m[3][1]) / determinant,/// 33
+
+					(-m.m[0][0] * m.m[1][1] * m.m[2][3]
+					 - m.m[0][1] * m.m[1][3] * m.m[2][0]
+					 - m.m[0][3] * m.m[1][0] * m.m[2][1]
+					 + m.m[0][3] * m.m[1][1] * m.m[2][0]
+					 + m.m[0][1] * m.m[1][0] * m.m[2][3]
+					 + m.m[0][0] * m.m[1][3] * m.m[2][1]) / determinant,/// 34
+
+					(-m.m[1][0] * m.m[2][1] * m.m[3][2]
+					 - m.m[1][1] * m.m[2][2] * m.m[3][0]
+					 - m.m[1][2] * m.m[2][0] * m.m[3][1]
+					 + m.m[1][2] * m.m[2][1] * m.m[3][0]
+					 + m.m[1][1] * m.m[2][0] * m.m[3][2]
+					 + m.m[1][0] * m.m[2][2] * m.m[3][1]) / determinant,/// 41
+
+					(+m.m[0][0] * m.m[2][1] * m.m[3][2]
+					 + m.m[0][1] * m.m[2][2] * m.m[3][0]
+					 + m.m[0][2] * m.m[2][0] * m.m[3][1]
+					 - m.m[0][2] * m.m[2][1] * m.m[3][0]
+					 - m.m[0][1] * m.m[2][0] * m.m[3][2]
+					 - m.m[0][0] * m.m[2][2] * m.m[3][1]) / determinant,/// 42
+
+					(-m.m[0][0] * m.m[1][1] * m.m[3][2]
+					 - m.m[0][1] * m.m[1][2] * m.m[3][0]
+					 - m.m[0][2] * m.m[1][0] * m.m[3][1]
+					 + m.m[0][2] * m.m[1][1] * m.m[3][0]
+					 + m.m[0][1] * m.m[1][0] * m.m[3][2]
+					 + m.m[0][0] * m.m[1][2] * m.m[3][1]) / determinant,/// 43
+
+					(+m.m[0][0] * m.m[1][1] * m.m[2][2]
+					 + m.m[0][1] * m.m[1][2] * m.m[2][0]
+					 + m.m[0][2] * m.m[1][0] * m.m[2][1]
+					 - m.m[0][2] * m.m[1][1] * m.m[2][0]
+					 - m.m[0][1] * m.m[1][0] * m.m[2][2]
+					 - m.m[0][0] * m.m[1][2] * m.m[2][1]) / determinant /// 44
+	};
+
+}
+
+Matrix4x4 Transpose(Matrix4x4 m) {
+	Matrix4x4 result = {};
+	for (int i = 0; i < 4; i++) {
+		for (int j = 0; j < 4; j++) {
+			result.m[i][j] = m.m[j][i];
+		}
+	}
+	return result;
+}
+
+
+Matrix4x4 MakeIdentity4x4() {
+	Matrix4x4 resuit = {};
+	for (int i = 0; i < 4; i++) {
+		for (int j = 0; j < 4; j++) {
+			resuit.m[i][j] = 0;
+			if (i == j) {
+				resuit.m[i][j] = 1;
+			}
+		}
+	}
+	return resuit;
+}
+
+void MatrixScreenPrintf(int x, int y, Matrix4x4& matrix, const char* name) {
+	int kColumnWidth = 60;
+	int kRowHeight = 20;
+	if (name == nullptr) {
+		for (int row = 0; row < 4; ++row) {
+			for (int column = 0; column < 4; ++column) {
+				Novice::ScreenPrintf(
+					x + column * kColumnWidth,
+					y + row * kRowHeight,
+					"%6.02f",
+					matrix.m[row][column]
+				);
+			}
+		}
+	} else {
+		Novice::ScreenPrintf(x, y, "%s", name);
+		for (int row = 0; row < 4; ++row) {
+			for (int column = 0; column < 4; ++column) {
+				Novice::ScreenPrintf(
+					x + column * kColumnWidth,
+					y + row * kRowHeight + kRowHeight,
+					"%6.02f",
+					matrix.m[row][column]
+				);
+			}
+		}
+	}
+}
+
+//////////////////////////////////////////////////////////////////////////陣列結合
+
+#pragma endregion
+
 #pragma region Other
 bool binaryComparator(int binary, int target) {
 	if (binary == (target & binary)) {
@@ -338,3 +819,4 @@ bool binaryComparator(int binary, int target) {
 	return false;
 }
 #pragma endregion
+
