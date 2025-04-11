@@ -36,18 +36,6 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		memcpy(preKeys, keys, 256);
 		Novice::GetHitKeyStateAll(keys);
 
-		Vector3 v1{ 1.0f, 3.0f, -5.0f };
-		Vector3 v2{ 4.0f, -1.0f, 2.0f };
-		float k = { 4.0f };
-
-		Vector3 resultAdd = Add(v1, v2);
-		Vector3 resultSubtract = Subtract(v1, v2);
-		Vector3 resultMultiply = Multiply(k, v1);
-		float resultDot = Dot(v1, v2);
-		float resultLength = Length(v1);
-		Vector3 resultNormalize = Normalize(v2);
-		float kRowHeight = 20.0f;
-
 		///=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=
 		/// ボタン処理
 		///=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=
@@ -56,17 +44,27 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		/// 更新処理
 		///=========================================================================================================================================================================================
 
+		int kRowHeight = 20;
+		Vector3 translate{ 4.1f, 2.6f, 0.8f };
+		Vector3 scale{ 1.5f, 5.2f, 7.3f };
+		Matrix4x4 translateMatrix = MakeTranslateMatrix(translate);
+		Matrix4x4 scaleMatrix = MakeScaleMatrix(scale);
+		Vector3 point{ 2.3f, 3.8f, 1.4f };
+		Matrix4x4 transformMatrix = {
+			1.0f, 2.0f, 3.0f, 4.0f,
+			3.0f, 1.0f, 1.0f, 2.0f,
+			1.0f, 4.0f, 2.0f, 3.0f,
+			2.0f, 2.0f, 1.0f, 3.0f
+		};
+		Vector3 transformed = viewFinilTransform(point, transformMatrix);
+
+		VectorScreenPrintf(0, 0, transformed, "transformed");
+		MatrixScreenPrintf(0, kRowHeight, translateMatrix, "translateMatrix");
+		MatrixScreenPrintf(0, kRowHeight * 5 + kRowHeight, scaleMatrix, "scaleMatrix");
 
 		///=========================================================================================================================================================================================
 		/// 描画処理
 		///=========================================================================================================================================================================================
-
-		VectorScreenPrintf(0, 0, resultAdd, "    : Add");
-		VectorScreenPrintf(0, (int)kRowHeight, resultSubtract, "    : Subtract");
-		VectorScreenPrintf(0, (int)kRowHeight * 2, resultMultiply, "    : Multiply");
-		Novice::ScreenPrintf(0, (int)kRowHeight * 3, "%.02f    : Dot", resultDot);
-		Novice::ScreenPrintf(0, (int)kRowHeight * 4, "%.02f    : Length", resultLength);
-		VectorScreenPrintf(0, (int)kRowHeight * 5, resultNormalize, "    : Normalize");
 
 		/// XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 		/// StageEND
